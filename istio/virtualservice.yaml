@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+
+metadata:
+  name: cipherwatch
+  namespace: apps
+
+spec:
+  hosts:
+    - "*"
+
+  gateways:
+    - cipherwatch-gateway
+
+  http:
+    - route:
+        - destination:
+            host: cipherwatch
+            port:
+              number: 80
