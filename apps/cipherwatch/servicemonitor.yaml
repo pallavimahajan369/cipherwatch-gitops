@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cipherwatch
+  namespace: monitoring
+
+spec:
+  selector:
+    matchLabels:
+      app: cipherwatch
+
+  namespaceSelector:
+    matchNames:
+      - apps
+
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
