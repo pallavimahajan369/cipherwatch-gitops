@@ -3,6 +3,9 @@ kind: Deployment
 
 metadata:
   name: cipherwatch
+  labels:
+    app: cipherwatch
+    project: sentinel
   namespace: apps
 
 spec:
@@ -16,6 +19,7 @@ spec:
     metadata:
       labels:
         app: cipherwatch
+        project: sentinel
 
     spec:
       containers:
