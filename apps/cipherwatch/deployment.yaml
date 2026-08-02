@@ -1,36 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
-  name: cipherwatch
+  name: aura-frontend
+  namespace: cipherwatch
   labels:
-    app: cipherwatch
-    project: sentinel
-  namespace: apps
+    app: aura-frontend
 
 spec:
-  replicas: 2
+  replicas: 1
 
   selector:
     matchLabels:
-      app: cipherwatch
+      app: aura-frontend
 
   template:
     metadata:
       labels:
-        app: cipherwatch
-        project: sentinel
+        app: aura-frontend
 
     spec:
       containers:
-        - name: cipherwatch
-
-          image: docker.io/dark0creator/cipherwatch:latest
-
+        - name: frontend
+          image: dark0creator/cipherwatch-frontend:d59cf9aa3ac03f8e4850c6b451239336ad9d0c80
           imagePullPolicy: Always
 
           ports:
-            - containerPort: 8080
+            - containerPort: 80
 
           resources:
             requests:
@@ -38,5 +33,114 @@ spec:
               memory: 128Mi
 
             limits:
-              cpu: 500m
+              cpu: 300m
               memory: 512Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aura-backend
+  namespace: cipherwatch
+  labels:
+    app: aura-backend
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: aura-backend
+
+  template:
+    metadata:
+      labels:
+        app: aura-backend
+
+    spec:
+      containers:
+        - name: backend
+          image: dark0creator/cipherwatch-backend:d59cf9aa3ac03f8e4850c6b451239336ad9d0c80
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 3000
+
+          envFrom:
+            - secretRef:
+                name: backend-secret
+
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+
+            limits:
+              cpu: 500m
+              memory: 1Gi
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aura-db
+  namespace: cipherwatch
+  labels:
+    app: aura-db
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: aura-db
+
+  template:
+    metadata:
+      labels:
+        app: aura-db
+
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 3306
+
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: DB_NAME
+
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: DB_PASSWORD
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+
+            limits:
+              cpu: 500m
+              memory: 1Gi
