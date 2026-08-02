@@ -1,17 +1,19 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: cipherwatch
+  name: cipherwatch-backend
   namespace: monitoring
+  labels:
+    release: monitoring
 
 spec:
   selector:
     matchLabels:
-      app: cipherwatch
+      app: aura-backend
 
   namespaceSelector:
     matchNames:
-      - apps
+      - cipherwatch
 
   endpoints:
     - port: http
