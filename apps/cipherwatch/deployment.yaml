@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: dark0creator/cipherwatch-frontend:latest
+          image: dark0creator/cipherwatch-frontend:4dc514992da0f0a2b80ea0070316a34e5b4c0767
           imagePullPolicy: Always
 
           ports:
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: dark0creator/cipherwatch-backend:latest
+          image: dark0creator/cipherwatch-backend:4dc514992da0f0a2b80ea0070316a34e5b4c0767
           imagePullPolicy: Always
 
           ports:
